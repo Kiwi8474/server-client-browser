@@ -427,23 +427,6 @@ def _perform_search(root, content_frame, url_entry, search_terms, push_to_histor
         url_entry.insert(0, "homepage://")
         render_page(content_frame, HOMEPAGE, root, url_entry)
         return
-    
-    if search_terms.startswith(f"http://{DEFAULT_SERVER}/r34/"):
-        for widget in content_frame.winfo_children():
-            widget.destroy()
-        tag = search_terms.replace(f"http://{DEFAULT_SERVER}/r34/", "")
-        gallery_page_markup = {
-            "url": search_terms,
-            "markup": [
-                "<mainbg> #FFC5CB",
-                f"<t> Search results for '{tag}' ; size 24 bold bg #FFC5CB :",
-                "<gallery> tag " + tag + " :"
-            ]
-        }
-        url_entry.delete(0, tk.END)
-        url_entry.insert(0, gallery_page_markup["url"].replace(" ", "%20"))
-        render_page(content_frame, gallery_page_markup, root, url_entry)
-        return
 
     if search_terms.startswith(f"http://{DEFAULT_SERVER}/wiki_search/"):
         wiki_term = search_terms.replace(f"http://{DEFAULT_SERVER}/wiki_search/", "")
@@ -550,7 +533,6 @@ SCRIPT_HANDLERS = {
     "set_command": interpreter.set_command_command,
     "set_text": interpreter.set_text_command,
     "set_text_input": interpreter.set_text_input,
-    "set_r34_search_command": interpreter.set_r34_search_command,
 }
 
 TAG_HANDLERS = {
