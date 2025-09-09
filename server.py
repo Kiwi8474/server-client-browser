@@ -12,8 +12,6 @@ images_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "images"
 
 WEBSITES_DATA = {}
 WIKI_DATA = {}
-R34_CACHE = {}
-R34_CACHE_LIFETIME = 300
 
 def load_server_config():
     config_path = os.path.join(os.path.dirname(__file__), "server_config.json")
@@ -84,7 +82,7 @@ def check_auth():
     print("-"*80)
     print(f"Connection from IP: {request.remote_addr}, requested URL: {request.url}")
 
-    if request.path.startswith("/images") or request.path.startswith("/website") or request.path.startswith("/search") or request.path.startswith("/r34"):
+    if request.path.startswith("/images") or request.path.startswith("/website") or request.path.startswith("/search"):
         client_key = request.headers.get("X-API-Key")
         print(f"Client key received: '{client_key}'")
         if client_key != SERVER_KEY or not SERVER_KEY:
@@ -176,50 +174,6 @@ def list_images(directory):
     
     files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     return jsonify(files)
-
-@app.route('/r34/<tag>')
-def fetch_r34_tags(tag):
-    global R34_CACHE
-
-    if tag in R34_CACHE and time.time() - R34_CACHE[tag]["timestamp"] < R34_CACHE_LIFETIME:
-        print(f"Returning cached data for tag: {tag}")
-        return jsonify(R34_CACHE[tag]["data"])
-
-    try:
-        api_url = f"https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=100&tags={tag}&json=1"
-        
-        response = requests.get(api_url)
-        response.raise_for_status()
-
-        data = response.json()
-        
-        if not data:
-            return jsonify({"error": "No results found"}), 404
-        
-        processed_images = []
-        for post in data:
-            image_url = post.get("file_url")
-            image_tags = post.get("tags")
-            
-            if image_url and image_tags:
-                processed_images.append({
-                    "url": image_url,
-                    "tags": image_tags.split()
-                })
-
-        R34_CACHE[tag] = {
-            "timestamp": time.time(),
-            "data": processed_images
-        }
-
-        return jsonify(processed_images)
-
-    except requests.exceptions.RequestException as e:
-        print(f"Network Error fetching from rule34.xxx: {e}")
-        return jsonify({"error": "Failed to fetch data from external API"}), 500
-    except json.JSONDecodeError:
-        print("JSON Decode Error: Malformed response from rule34.xxx")
-        return jsonify({"error": "Invalid response format"}), 500
 
 @app.route('/raw/<path:url>')
 def get_raw_json(url):
