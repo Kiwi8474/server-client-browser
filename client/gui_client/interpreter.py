@@ -172,13 +172,6 @@ def set_text_input(args, root, content_frame, url_entry, widgets):
         widgets[args[0]].delete(0, 'end')
         widgets[args[0]].insert(0, text_to_set)
 
-def set_r34_search_command(args, root, content_frame, url_entry, widgets, DEFAULT_SERVER, _perform_search):
-    if len(args) >= 2 and args[0] in widgets and args[1] in widgets:
-        button_id = args[0]
-        entry_id = args[1]
-        
-        widgets[button_id].configure(command=lambda: _perform_search(root, content_frame, url_entry, f"http://{DEFAULT_SERVER}/r34/{widgets[entry_id].get()}"))
-
 def handle_script_tag(root_frame, script_content, root, url_entry, SCRIPT_HANDLERS, widgets, _handle_search, DEFAULT_SERVER, _perform_search, _handle_wiki_search):
     script_commands = script_content.strip().split(';')
     
@@ -201,8 +194,6 @@ def handle_script_tag(root_frame, script_content, root, url_entry, SCRIPT_HANDLE
                 SCRIPT_HANDLERS[command](args, root, root_frame, url_entry, widgets)
             elif command == "set_text_input":
                 SCRIPT_HANDLERS[command](args, root, root_frame, url_entry, widgets)
-            elif command == "set_r34_search_command":
-                SCRIPT_HANDLERS[command](args, root, root_frame, url_entry, widgets, DEFAULT_SERVER, _perform_search)
             else:
                 SCRIPT_HANDLERS[command](args, root, root_frame, url_entry)
 
